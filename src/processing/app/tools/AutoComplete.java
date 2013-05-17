@@ -1,0 +1,106 @@
+package processing.app.tools;
+/*
+ * Nearly all of this code is
+ * Copyright © 2010-2011 Werner Randelshofer, Immensee, Switzerland.
+ * All rights reserved.
+ * (However, he should not be held responsible for the current mess of a hack
+ * that it has become.)
+ *
+ * You may not use, copy or modify this file, except in compliance with the
+ * license agreement you entered into with Werner Randelshofer.
+ * For details see accompanying license terms.
+ */
+
+import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileSystemView;
+
+import processing.app.Editor;
+
+
+
+public class AutoComplete extends JFrame implements Tool {
+  final static DefaultListModel model = new DefaultListModel();
+static String content;
+int index;
+File api;
+
+ Editor editor;
+
+
+  public String getMenuTitle() {
+    return "Auto Complete test";
+  }
+
+
+  public void run() {
+JTextArea text = new JTextArea(100,30);
+String line ;
+content = editor.getText();
+//put the destination of the api file here
+//api = new File(""); put the api.txt file destination between quotes . default will be in
+BufferedReader in;
+try{
+ in = new BufferedReader(new FileReader(api));
+line = in.readLine();
+while(line != null){
+index = line.indexOf(content);
+if (index != -1){
+model.addElement(line);
+  text.append(line + "\n");
+  line = in.readLine();}else{
+	line = in.readLine();
+}
+}
+}catch (Exception ex){
+	System.out.println("Exception");
+}
+
+   /*JFrame f = new JFrame("auto complete test");
+    JPanel upperPanel = new JPanel();
+    JPanel lowerPanel = new JPanel();
+    f.getContentPane().add(upperPanel, "North");
+    upperPanel.add(text);
+*/
+JFrame frame = new JFrame("Auto complete dialog");
+  JPanel panel = new JPanel();
+  JList list = new JList(model);
+  frame.setUndecorated(false);
+  panel.add(list);
+  frame.add(panel);
+  frame.setSize(400,400);
+  frame.setVisible(true);
+list.addMouseListener(new MouseAdapter() {
+    public void mouseClicked(MouseEvent evt) {
+        JList list = (JList)evt.getSource();
+        if (evt.getClickCount() == 2) {
+		editor.setText((String)list.getSelectedValue());
+        } else if (evt.getClickCount() == 3) {   // Triple-click
+            int index2 = list.locationToIndex(evt.getPoint());
+
+        }
+    }
+});
+  
+/*
+    f.pack();
+    f.setVisible(true);*/
+	//editor.setText("Deleted your code. What now?");
+
+  }
+
+
+  public void init(Editor editor) {
+
+	this.editor = editor;
+
+}
+
+}
